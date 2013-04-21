@@ -35,7 +35,7 @@ public:
 
 public:
 	MyColor(float r, float g, float b) :
-	  r(r), g(g), b(b) {}
+		r(r), g(g), b(b) {}
 };
 
 static MyColor *CLR_NEAR = new MyColor(0.99, 0.0, 0.0);
@@ -49,15 +49,15 @@ public:
 
 public:
 	MyPoint(float X, float Y) :
-	  x(X), y(Y) {}
+		x(X), y(Y) {}
 };
 
 
 // két szakasz egymáshoz képest milyen irányban állnak
 static int RotDirct(MyPoint *p0, MyPoint *p1, MyPoint *p2){
-// Kimenet: +1 ha p0->p1->p2 balra fordul,
-//			0 ha p0,p1 és p2 kollineárisak,
-//			-1 ha p0->p1->p2 jobbra fordul.
+	// Kimenet: +1 ha p0->p1->p2 balra fordul,
+	//			0 ha p0,p1 és p2 kollineárisak,
+	//			-1 ha p0->p1->p2 jobbra fordul.
 
 	double p1xp2 = (p1->x - p0->x) * (p2->y - p0->y) - (p2->x - p0->x) * (p1->y - p0->y);
 	int signum = (p1xp2 < 0) ? (-1) : ((p1xp2 > 0) ? (1) : (0));
@@ -106,188 +106,188 @@ public:
 
 public:
 	GraphObject(float x, float y, float r, int nP, float rotA, MyColor *c, float vx, float vy) :
-	  cX(x), cY(y), R(r), numPoints(nP), rotAngle(rotA), clr(c), vX(vx), vY(vy)
-	  {
-		  points = new vector<MyPoint*>();
-		  
-		  float xMin = 1000;
-		  float xMax = -1000;
-		  float yMin = 1000;
-		  float yMax = -1000;
+		cX(x), cY(y), R(r), numPoints(nP), rotAngle(rotA), clr(c), vX(vx), vY(vy)
+	{
+		points = new vector<MyPoint*>();
 
-		  float newX, newY;
+		float xMin = 1000;
+		float xMax = -1000;
+		float yMin = 1000;
+		float yMax = -1000;
 
-		  float angle = rotA;
-		  for(int i = 0;  i < nP; i++)
-		  {
-			  angle += 2.0 * GL_PI / nP;
+		float newX, newY;
 
-			  newX = x + r * cos(angle);
-			  newY = y + r * sin(angle);
+		float angle = rotA;
+		for(int i = 0;  i < nP; i++)
+		{
+			angle += 2.0 * GL_PI / nP;
 
-			  // a szélsõ pontok x és y koordinátáinak megjegyzése
-			  if (xMax < newX)
-			  {
-				  xMax = newX;
-				  iXMax = i;
-			  }
-			  if (yMax < newY)
-			  {
-				  yMax = newY;
-				  iYMax = i;
-			  }
+			newX = x + r * cos(angle);
+			newY = y + r * sin(angle);
 
-			  if (xMin > newX)
-			  {
-				  xMin = newX;
-				  iXMin = i;
-			  }
-			  if (yMin > newY)
-			  {
-				  yMin = newY;
-				  iYMin = i;
-			  }
+			// a szélsõ pontok x és y koordinátáinak megjegyzése
+			if (xMax < newX)
+			{
+				xMax = newX;
+				iXMax = i;
+			}
+			if (yMax < newY)
+			{
+				yMax = newY;
+				iYMax = i;
+			}
 
-			  points->push_back(new MyPoint( newX, newY));
-		  }
+			if (xMin > newX)
+			{
+				xMin = newX;
+				iXMin = i;
+			}
+			if (yMin > newY)
+			{
+				yMin = newY;
+				iYMin = i;
+			}
 
-		  numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	  
-	  }
+			points->push_back(new MyPoint( newX, newY));
+		}
 
-	  float XMin()
-	  {
-		  return (*points)[iXMin]->x;
-	  }
-	  float XMax()
-	  {
-		  return (*points)[iXMax]->x;
-	  }
-	  float YMin()
-	  {
-		  return (*points)[iYMin]->y;
-	  }
-	  float YMax()
-	  {
-		  return (*points)[iYMax]->y;
-	  }
+		numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	  
+	}
 
-	  bool IsNear(GraphObject *obj)
-	  {
-		  if (!obj) return false;
+	float XMin()
+	{
+		return (*points)[iXMin]->x;
+	}
+	float XMax()
+	{
+		return (*points)[iXMax]->x;
+	}
+	float YMin()
+	{
+		return (*points)[iYMin]->y;
+	}
+	float YMax()
+	{
+		return (*points)[iYMax]->y;
+	}
 
-		  float xMin = XMin();
-		  float xMax = XMax();
-		  float yMin = YMin();
-		  float yMax = YMax();
+	bool IsNear(GraphObject *obj)
+	{
+		if (!obj) return false;
 
-		  float objxMin = obj->XMin();
-		  float objxMax = obj->XMax();
-		  float objyMin = obj->YMin();
-		  float objyMax = obj->YMax();
+		float xMin = XMin();
+		float xMax = XMax();
+		float yMin = YMin();
+		float yMax = YMax();
 
-		  if (((xMin <= objxMin && objxMin <= xMax) || (xMin <= objxMax && objxMax <= xMax)) &&
-			  ((yMin <= objyMin && objyMin <= yMax) || (yMin <= objyMax && objyMax <= yMax)) )
-			  return true;
+		float objxMin = obj->XMin();
+		float objxMax = obj->XMax();
+		float objyMin = obj->YMin();
+		float objyMax = obj->YMax();
 
-		  return false;
-	  }
+		if (((xMin <= objxMin && objxMin <= xMax) || (xMin <= objxMax && objxMax <= xMax)) &&
+			((yMin <= objyMin && objyMin <= yMax) || (yMin <= objyMax && objyMax <= yMax)) )
+			return true;
 
-	  // a két objektum ériintkezik-e egymással?
-	  bool IsContact(GraphObject *obj)
-	  {
-		  // sajátmagam minden pontjára
-		  for(int i = 0; i < points->size(); ++i)
-		  {
-			  int sgn;
+		return false;
+	}
 
-			  // a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-			  int signumMy = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-				  (*points)[(i + 2) % points->size()]);
+	// a két objektum ériintkezik-e egymással?
+	bool IsContact(GraphObject *obj)
+	{
+		// sajátmagam minden pontjára
+		for(int i = 0; i < points->size(); ++i)
+		{
+			int sgn;
 
-			  // a vizsgált pont a másik oldalon van, érdemes folytatni
+			// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
+			int signumMy = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+				(*points)[(i + 2) % points->size()]);
 
-			  // az összehasonlított objektum minden pontjával
-			  for(int j = 0; j < obj->points->size(); ++j)
-			  {
-				  sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-					  (*(obj->points))[j % obj->points->size()]);
+			// a vizsgált pont a másik oldalon van, érdemes folytatni
 
-				  // azonos oldalon vannak és az elsõ kettõ által téglalapon belül a harmadik
-				  if (signumMy == sgn && IsPointBetween((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-					  (*(obj->points))[j % obj->points->size()]))
-				  {
-					  // összeért
-					  return true;
-				  }
-			  }
+			// az összehasonlított objektum minden pontjával
+			for(int j = 0; j < obj->points->size(); ++j)
+			{
+				sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+					(*(obj->points))[j % obj->points->size()]);
 
-		  }
+				// azonos oldalon vannak és az elsõ kettõ által téglalapon belül a harmadik
+				if (signumMy == sgn && IsPointBetween((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+					(*(obj->points))[j % obj->points->size()]))
+				{
+					// összeért
+					return true;
+				}
+			}
 
-		  return false;
-	  }
+		}
 
-
-	  /*
-	  // a két objektum ériintkezik-e egymással?
-	  bool IsContact(GraphObject *obj)
-	  {
-		  // sajátmagam minden pontjára
-		  for(int i = 0; i < points->size(); ++i)
-		  {
-			  bool metszes = true;
-			  int sgn;
-
-			  // a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-			  int signumMy = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
-				  (*points)[(i + 2) % points->size()]);
-
-			  int signumComp = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
-				  (*(obj->points))[0]);
-
-			  if (signumMy != signumComp)
-			  {
-				  // a vizsgált pont a másik oldalon van, érdemes folytatni
-
-				  // az összehasonlított objektum minden pontjával
-				  for(int j = 1; j < obj->points->size() + 1; ++j)
-				  {
-					  sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-						  (*(obj->points))[j % obj->points->size()]);
-
-					  // ha bármely két pont 
-					  if (signumComp != sgn)
-					  {
-						  // összeérhet
-						  continue;
-					  }
-
-					  // nem ér össze
-					  return false;
-				  }
-			  }
-		  }
-
-		  return true;
-	  }
-	  /* */
+		return false;
+	}
 
 
-	  ~GraphObject()
-	  {
-		  if (clr)
-			  delete clr;
-		  clr = NULL;
-	  }
+	/*
+	// a két objektum ériintkezik-e egymással?
+	bool IsContact(GraphObject *obj)
+	{
+	// sajátmagam minden pontjára
+	for(int i = 0; i < points->size(); ++i)
+	{
+	bool metszes = true;
+	int sgn;
 
-	  bool operator==(const GraphObject *c)
-	  {
-		  return (c->cX == cX) && (c->cY == cY) && (c->R == R) && (c->rotAngle == rotAngle);
-	  }
+	// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
+	int signumMy = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
+	(*points)[(i + 2) % points->size()]);
 
-	  bool operator!=(const GraphObject *c)
-	  {
-		  return !(this->operator==(c));
-	  }
+	int signumComp = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
+	(*(obj->points))[0]);
+
+	if (signumMy != signumComp)
+	{
+	// a vizsgált pont a másik oldalon van, érdemes folytatni
+
+	// az összehasonlított objektum minden pontjával
+	for(int j = 1; j < obj->points->size() + 1; ++j)
+	{
+	sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+	(*(obj->points))[j % obj->points->size()]);
+
+	// ha bármely két pont 
+	if (signumComp != sgn)
+	{
+	// összeérhet
+	continue;
+	}
+
+	// nem ér össze
+	return false;
+	}
+	}
+	}
+
+	return true;
+	}
+	/* */
+
+
+	~GraphObject()
+	{
+		if (clr)
+			delete clr;
+		clr = NULL;
+	}
+
+	bool operator==(const GraphObject *c)
+	{
+		return (c->cX == cX) && (c->cY == cY) && (c->R == R) && (c->rotAngle == rotAngle);
+	}
+
+	bool operator!=(const GraphObject *c)
+	{
+		return !(this->operator==(c));
+	}
 };
 
 // körök gyûjteménye
@@ -447,7 +447,7 @@ void SpecialKeys(int key, int x, int y)
 	// ...
 	int state;
 
-	
+
 	if(key == GLUT_KEY_UP)
 	{
 		RENDER_PAUSE = !RENDER_PAUSE;
@@ -641,7 +641,7 @@ int main(int argc, char* argv[])
 
 		float objAngle = (rand() % 100) / 100.0 * GL_PI;
 		graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift, radius, rand() % 5 + 3, objAngle,
-			
+
 			//new MyColor(i*0.1 + 0.3, i*0.1, 0.8),
 			CLR_NORMAL,
 
