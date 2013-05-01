@@ -11,11 +11,10 @@
 
 #include <GL/glut.h>
 
-#include "MyColor.h"
-#include "MyPoint.h"
-#include "GraphObject.h"
+#include "Common.h"
 
 using namespace std;
+
 
 // Define a constant for the value of PI
 #define GL_PI 3.141592654f
@@ -26,19 +25,6 @@ static int IdlePrint = 0;
 static bool RENDER_PAUSE;
 static bool RENDER_STEP;
 
-static float screenXMin = -30.0;
-static float screenYMin = -20.0;
-static float screenXMax = 30.0;
-static float screenYMax = 20.0;
-
-static MyColor *CLR_NEAR = new MyColor(0.99, 0.0, 0.0);
-static MyColor *CLR_NORMAL = new MyColor(0.0, 0.7, 0.0);
-
-
-
-// körök gyûjteménye
-static set<GraphObject*> *graphObjSet;
-static set<GraphObject*>::const_iterator it;
 
 void DrawGraphObj(const GraphObject *c)
 {
@@ -59,93 +45,6 @@ void DrawGraphObj(const GraphObject *c)
 	glEnd();
 }
 
-bool DistanceCheck(GraphObject *c)
-{
-	set<GraphObject*>::const_iterator i;
-	for (i = graphObjSet->begin(); i != graphObjSet->end(); ++i)
-	{
-		if (((*c) != (*i)) && c->IsNear(*i))
-		{
-			c->clr = CLR_NEAR;
-
-			if (c->IsContact(*i))
-			{
-				c->vX *= -1;
-				c->vY *= -1;
-
-				(*i)->vX *= -1;
-				(*i)->vY *= -1;
-			}
-
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void UpDateGraphObjectPosition(GraphObject *c)
-{
-	if (!c) return;
-
-	c->cX += c->vX;
-	c->cY += c->vY;
-
-	///////////////////////////////////////////////////////////////////////////
-	// falakról visszaverõdés
-
-	// faltól mért távolság
-	float dist;
-	// az elmozdulás mértéke
-	float shiftX = c->vX;
-	float shiftY = c->vY;
-
-	dist = c->vX + c->XMax();
-	if (dist > screenXMax)
-	{
-		shiftX -= 2 * (c->XMax() + c->vX - screenXMax);
-		c->vX *= -1;
-	}
-
-	dist = c->vX + c->XMin();
-	if (dist < screenXMin)
-	{
-		shiftX -= 2 * (c->XMin() + c->vX - screenXMin);
-		c->vX *= -1;
-	}
-
-	dist = c->vY + c->YMax();
-	if (dist > screenYMax)
-	{
-		shiftY -= 2 * (c->YMax() + c->vY - screenYMax);
-		c->vY *= -1;
-	}
-
-	dist = c->vY + c->YMin();
-	if (dist < screenYMin)
-	{
-		shiftY -= 2 * (c->YMin() + c->vY - screenYMin);
-		c->vY *= -1;
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// az egymással érintkezés
-	set<GraphObject*>::iterator iter;
-	for(iter = graphObjSet->begin(); iter != graphObjSet->end(); ++iter)
-	{
-		if ((*iter)->clr == CLR_NEAR)
-		{
-		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-	// az elmozdulás alkalmazása
-	for(unsigned int i = 0; i < c->points->size(); ++i)
-	{
-		(*(c->points))[i]->x += shiftX;
-		(*(c->points))[i]->y += shiftY;
-	}
-}
 
 // Called to draw scene
 void RenderScene(void)
@@ -158,18 +57,18 @@ void RenderScene(void)
 	// a játszótér kerete
 	glBegin(GL_LINE_LOOP);
 	glColor3f( 0.5, 1.0, 0.0);
-	glVertex2f(screenXMin, screenYMin);
-	glVertex2f(screenXMax, screenYMin);
-	glVertex2f(screenXMax, screenYMax);
-	glVertex2f(screenXMin, screenYMax);
+	glVertex2f(Common::screenXMin, Common::screenYMin);
+	glVertex2f(Common::screenXMax, Common::screenYMin);
+	glVertex2f(Common::screenXMax, Common::screenYMax);
+	glVertex2f(Common::screenXMin, Common::screenYMax);
 	glEnd();
 
-
-	for(it = graphObjSet->begin(); it != graphObjSet->end(); ++it)
+	for(set<GraphObject*>::iterator it = Common::graphObjSet->begin();
+		it != Common::graphObjSet->end(); ++it)
 	{
-		(*it)->clr = CLR_NORMAL;
-		DistanceCheck(*it);
-		UpDateGraphObjectPosition(*it);
+		(*it)->clr = Common::CLR_NORMAL;
+		Common::DistanceCheck(*it);
+		Common::UpDateGraphObjectPosition(*it);
 		DrawGraphObj(*it);
 	}
 	// << Modellezo programresz
@@ -369,8 +268,6 @@ int main(int argc, char* argv[])
 	// >> Inicializálás
 
 	RENDER_PAUSE = false;
-	graphObjSet = new set<GraphObject*>();
-
 
 	float radius = 2.0;
 	float placeRadius = radius * 4;
@@ -386,10 +283,10 @@ int main(int argc, char* argv[])
 		vY = 0.063 + 0.063 * ((rand() % 20) - 10) * 0.10;
 
 		float objAngle = (rand() % 100) / 100.0 * GL_PI;
-		graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift, radius, rand() % 5 + 3, objAngle,
+		Common::graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift, radius, rand() % 5 + 3, objAngle,
 
 			//new MyColor(i*0.1 + 0.3, i*0.1, 0.8),
-			CLR_NORMAL,
+			Common::CLR_NORMAL,
 
 			vX, vY));
 		angle += 2.0 * GL_PI / circleNum;
