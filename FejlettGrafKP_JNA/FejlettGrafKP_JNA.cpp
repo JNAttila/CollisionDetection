@@ -11,6 +11,9 @@
 
 #include <GL/glut.h>
 
+#include "MyColor.h"
+
+
 using namespace std;
 
 // Define a constant for the value of PI
@@ -26,17 +29,6 @@ static float screenXMin = -30.0;
 static float screenYMin = -20.0;
 static float screenXMax = 30.0;
 static float screenYMax = 20.0;
-
-// szín reprezentáló osztály
-class MyColor
-{
-public:
-	float r, g, b;
-
-public:
-	MyColor(float r, float g, float b) :
-		r(r), g(g), b(b) {}
-};
 
 static MyColor *CLR_NEAR = new MyColor(0.99, 0.0, 0.0);
 static MyColor *CLR_NORMAL = new MyColor(0.0, 0.7, 0.0);
