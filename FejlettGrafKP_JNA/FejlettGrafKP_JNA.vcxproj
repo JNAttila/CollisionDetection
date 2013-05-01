@@ -79,6 +79,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GraphObject.h" />
     <ClInclude Include="MyColor.h" />
     <ClInclude Include="MyPoint.h" />
     <ClInclude Include="stdafx.h" />
@@ -86,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FejlettGrafKP_JNA.cpp" />
+    <ClCompile Include="GraphObject.cpp" />
     <ClCompile Include="MyColor2.cpp" />
     <ClCompile Include="MyPoint.cpp" />
     <ClCompile Include="stdafx.cpp" />
