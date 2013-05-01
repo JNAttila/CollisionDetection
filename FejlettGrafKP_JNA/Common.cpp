@@ -4,13 +4,18 @@ using namespace std;
 
 MyColor* Common::CLR_NEAR = new MyColor(0.99, 0.0, 0.0);
 MyColor* Common::CLR_NORMAL = new MyColor(0.0, 0.7, 0.0);
+MyColor* Common::CLR_CHG = new MyColor(0.8, 0.8, 0);
 
-float Common::screenXMin = -30.0;
-float Common::screenYMin = -20.0;
-float Common::screenXMax = 30.0;
-float Common::screenYMax = 20.0;
+float Common::screenXMin = 0;
+float Common::screenYMin = 0;
+float Common::screenXMax = 0;
+float Common::screenYMax = 0;
+
+float Common::nRange = 0;
 
 set<GraphObject*> *Common::graphObjSet = new set<GraphObject*>();
+
+bool Common::renderForward = true;
 
 bool Common::DistanceCheck(GraphObject *c)
 {
@@ -42,8 +47,16 @@ void Common::UpDateGraphObjectPosition(GraphObject *c)
 {
 	if (!c) return;
 
-	c->cX += c->vX;
-	c->cY += c->vY;
+	if (renderForward)
+	{
+		c->cX += c->vX;
+		c->cY += c->vY;
+	}
+	else
+	{
+		c->cX -= c->vX;
+		c->cY -= c->vY;
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// falakról visszaverõdés

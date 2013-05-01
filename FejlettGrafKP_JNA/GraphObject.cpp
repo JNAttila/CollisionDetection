@@ -1,7 +1,8 @@
 #define _USE_MATH_DEFINES
 
-#include "GraphObject.h"
-#include "MyPoint.h"
+#include "Common.h"
+//#include "GraphObject.h"
+//#include "MyPoint.h"
 
 #include <math.h>
 
@@ -96,26 +97,32 @@ bool GraphObject::IsNear(GraphObject *obj)
 // a két objektum ériintkezik-e egymással?
 bool GraphObject::IsContact(GraphObject *obj)
 {
-	// sajátmagam minden pontjára
-	for(int i = 0; i < points->size(); ++i)
-	{
-		int sgn;
+	// az alap objektum pontjainak száma
+	long s = points->size();
 
+	// amit hasonlítunk hozzá objektum pontjainak száma
+	long so = obj->points->size();
+
+	// a két objektum pontjaiból számolt forgásirány
+	int sgn;
+
+	// sajátmagam minden pontjára
+	for(int i = 0; i < s; ++i)
+	{
 		// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-		int signumMy = CMyPoint::RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-			(*points)[(i + 2) % points->size()]);
+		int mySgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s], (*points)[(i + 2) % s]);
 
 		// a vizsgált pont a másik oldalon van, érdemes folytatni
 
 		// az összehasonlított objektum minden pontjával
-		for(int j = 0; j < obj->points->size(); ++j)
+		for(int j = 0; j < so; ++j)
 		{
-			sgn = CMyPoint::RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-				(*(obj->points))[j % obj->points->size()]);
+			sgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s],
+				(*(obj->points))[j % so]);
 
 			// azonos oldalon vannak és az elsõ kettõ által téglalapon belül a harmadik
-			if (signumMy == sgn && CMyPoint::IsPointBetween((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-				(*(obj->points))[j % obj->points->size()]))
+			if (mySgn == sgn && CMyPoint::IsPointBetween((*points)[i % s],
+				(*points)[(i + 1) % s], (*(obj->points))[j % so]))
 			{
 				// összeért
 				return true;
@@ -125,6 +132,53 @@ bool GraphObject::IsContact(GraphObject *obj)
 	}
 
 	return false;
+}
+
+
+// a két objektum ériintkezik-e egymással?
+bool GraphObject::IsContact2(GraphObject *obj)
+{
+	// az alap objektum pontjainak száma
+	long s = points->size();
+
+	// amit hasonlítunk hozzá objektum pontjainak száma
+	long so = obj->points->size();
+
+	// objektumokat összehasonlító szakaszokból számolt forgásirány
+	int sgn;
+
+	// saját objektumon belül a forgásirány
+	int mySgn;
+
+	// poligon vágást kell csinálni, hogy a vizsgált objektum bármelyik pontja
+	// belül van-e az n körvonalamon
+
+	// sajátmagam minden pontjára
+	for(int i = 0; i < s; ++i)
+	{
+		// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
+		int mySgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s], (*points)[(i + 2) % s]);
+
+
+		bool kulonVannak = true;
+
+		// az összehasonlított objektum minden pontjával
+		for(int j = 0; j < so; ++j)
+		{
+			sgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s],
+				(*(obj->points))[j % so]);
+
+			kulonVannak &= (mySgn != sgn);
+		}
+
+		if (kulonVannak)
+		{
+			clr = Common::CLR_CHG;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 

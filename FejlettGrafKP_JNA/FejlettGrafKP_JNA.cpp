@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <set>
 #include <vector>
+#include <ctime>
 
 #include <GL/glut.h>
 
@@ -54,15 +55,6 @@ void RenderScene(void)
 
 	// >> Modellezo programresz
 
-	// a játszótér kerete
-	glBegin(GL_LINE_LOOP);
-	glColor3f( 0.5, 1.0, 0.0);
-	glVertex2f(Common::screenXMin, Common::screenYMin);
-	glVertex2f(Common::screenXMax, Common::screenYMin);
-	glVertex2f(Common::screenXMax, Common::screenYMax);
-	glVertex2f(Common::screenXMin, Common::screenYMax);
-	glEnd();
-
 	for(set<GraphObject*>::iterator it = Common::graphObjSet->begin();
 		it != Common::graphObjSet->end(); ++it)
 	{
@@ -97,18 +89,19 @@ void SpecialKeys(int key, int x, int y)
 	{
 		RENDER_PAUSE = !RENDER_PAUSE;
 	}
-	/*if(key == GLUT_KEY_DOWN)
+	if(key == GLUT_KEY_DOWN)
 	{
-	if (CIRCLE_POINTS > 3)
-	CIRCLE_POINTS--;
-	}*/
+		Common::renderForward = !Common::renderForward;
+	}
 	if(key == GLUT_KEY_LEFT)
 	{
-		RENDER_STEP = true;
+		Common::renderForward = true;
 	}
-	/*if(key == GLUT_KEY_RIGHT)
-	...
-	*/
+	if(key == GLUT_KEY_RIGHT)
+	{
+		Common::renderForward = false;
+	}
+
 
 	printf("Funkciobillentyu lenyomva, kodja %d, pozicio (%d,%d). ", key, x, y);
 	state = glutGetModifiers();
@@ -168,24 +161,35 @@ void Idle()
 
 void ChangeSizeOrtho(int w, int h)
 {
-	GLfloat nRange = 25.0f;
-
 	// Prevent a divide by zero
 	if(h == 0)
 		h = 1;
 
 	// Set Viewport to window dimensions
 	glViewport(0, 0, w, h);
-
+	
 	// Reset projection matrix stack
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
 	// Establish clipping volume (left, right, bottom, top, near, far)
-	if (w <= h) 
-		glOrtho (-nRange, nRange, -nRange*h/w, nRange*h/w, -nRange, nRange);
-	else 
-		glOrtho (-nRange*w/h, nRange*w/h, -nRange, nRange, -nRange, nRange);
+	if (w <= h)
+	{
+		Common::screenXMin = -Common::nRange;
+		Common::screenXMax = Common::nRange;
+		Common::screenYMin = -Common::nRange*h/w;
+		Common::screenYMax = Common::nRange*h/w;
+	}
+	else
+	{
+		Common::screenXMin = -Common::nRange*w/h;
+		Common::screenXMax = Common::nRange*w/h;
+		Common::screenYMin = -Common::nRange;
+		Common::screenYMax = Common::nRange;
+	}
+	
+	glOrtho (Common::screenXMin, Common::screenXMax, Common::screenYMin, Common::screenYMax,
+		-Common::nRange, Common::nRange);
 
 	// Reset Model view matrix stack
 	glMatrixMode(GL_MODELVIEW);
@@ -259,20 +263,22 @@ void ProcessMenu(int value)
 int main(int argc, char* argv[])
 {
 	// >> Inicializalas
+	//srand(time(NULL));
+	Common::nRange = 10;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(1024, 600);
+	glutInitWindowSize(640, 480);
 	glutCreateWindow("Fejlett Grafikai Algoritmusok - Süni");
 
 	// >> Inicializálás
 
-	RENDER_PAUSE = false;
+	RENDER_PAUSE = true;
 
 	float radius = 2.0;
 	float placeRadius = radius * 4;
 	float angle = 0.0;
-	int circleNum = 10;
+	int circleNum = 2;
 	float xShift = 0.0;
 	float yShift = 0.0;
 	float vX = 0.074;
