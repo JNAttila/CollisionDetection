@@ -12,6 +12,7 @@
 #include <GL/glut.h>
 
 #include "MyColor.h"
+#include "MyPoint.h"
 
 
 using namespace std;
@@ -45,31 +46,6 @@ public:
 };
 
 
-// két szakasz egymáshoz képest milyen irányban állnak
-static int RotDirct(MyPoint *p0, MyPoint *p1, MyPoint *p2){
-	// Kimenet: +1 ha p0->p1->p2 balra fordul,
-	//			0 ha p0,p1 és p2 kollineárisak,
-	//			-1 ha p0->p1->p2 jobbra fordul.
-
-	double p1xp2 = (p1->x - p0->x) * (p2->y - p0->y) - (p2->x - p0->x) * (p1->y - p0->y);
-	int signum = (p1xp2 < 0) ? (-1) : ((p1xp2 > 0) ? (1) : (0));
-	return signum;
-}
-
-// P1 és P2 által kijelöl téglalapon belül van-e PT
-bool IsPointBetween(MyPoint *p1, MyPoint *p2, MyPoint *pt)
-{
-	float xMin = min<int>(p1->x, p2->x);
-	float xMax = max<int>(p1->x, p2->x);
-	float yMin = min<int>(p1->y, p2->y);
-	float yMax = max<int>(p1->y, p2->y);
-
-	if ((xMin <= pt->x) && (pt->x <= xMax) && (yMin <= pt->y) && (pt->y <= yMax))
-		return true;
-
-	return false;
-}
-
 // egy grafikai objektum adatai
 class GraphObject
 {
@@ -84,7 +60,7 @@ public:
 	float rotAngle;
 
 	// a pontok listája
-	vector<MyPoint*> *points;
+	vector<CMyPoint*> *points;
 
 	// a határoló téglalap koordinátáinak indexe a listában
 	int iXMin, iXMax;
@@ -100,7 +76,7 @@ public:
 	GraphObject(float x, float y, float r, int nP, float rotA, MyColor *c, float vx, float vy) :
 		cX(x), cY(y), R(r), numPoints(nP), rotAngle(rotA), clr(c), vX(vx), vY(vy)
 	{
-		points = new vector<MyPoint*>();
+		points = new vector<CMyPoint*>();
 
 		float xMin = 1000;
 		float xMax = -1000;
@@ -140,7 +116,7 @@ public:
 				iYMin = i;
 			}
 
-			points->push_back(new MyPoint( newX, newY));
+			points->push_back(new CMyPoint( newX, newY));
 		}
 
 		numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	  
@@ -193,7 +169,7 @@ public:
 			int sgn;
 
 			// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-			int signumMy = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+			int signumMy = CMyPoint::RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
 				(*points)[(i + 2) % points->size()]);
 
 			// a vizsgált pont a másik oldalon van, érdemes folytatni
@@ -201,11 +177,11 @@ public:
 			// az összehasonlított objektum minden pontjával
 			for(int j = 0; j < obj->points->size(); ++j)
 			{
-				sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+				sgn = CMyPoint::RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
 					(*(obj->points))[j % obj->points->size()]);
 
 				// azonos oldalon vannak és az elsõ kettõ által téglalapon belül a harmadik
-				if (signumMy == sgn && IsPointBetween((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
+				if (signumMy == sgn && CMyPoint::IsPointBetween((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
 					(*(obj->points))[j % obj->points->size()]))
 				{
 					// összeért
