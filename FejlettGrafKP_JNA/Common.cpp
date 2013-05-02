@@ -1,4 +1,5 @@
 #include "Common.h"
+#include <math.h>
 
 using namespace std;
 
@@ -17,25 +18,52 @@ set<GraphObject*> *Common::graphObjSet = new set<GraphObject*>();
 
 bool Common::renderForward = true;
 
+bool Common::PointLineDist(CMyPoint *p1, CMyPoint *p2, CMyPoint *pp)
+{
+	if (!p1 || !p2 || !pp)
+		return false;
+
+	float  xMin = min<float>(p1->x, p2->x);
+	float  xMax = max<float>(p1->y, p2->y);
+	float  yMin = min<float>(p1->x, p2->x);
+	float  yMax = max<float>(p1->y, p2->y);
+
+	if (pp->x < xMin || pp->x > xMax || pp->y < yMin || pp->y > yMax)
+		return false;
+
+	if (abs(abs((p1->x - p2->x)/(p1->y - p2->y)) - abs((p1->x - pp->x)/(p1->y - pp->y))) < 0.1)
+		return true;
+
+	return false;
+}
+
 bool Common::DistanceCheck(GraphObject *c)
 {
-	set<GraphObject*>::const_iterator i;
-	for (i = Common::graphObjSet->begin(); i != Common::graphObjSet->end(); ++i)
+	for (set<GraphObject*>::iterator i = Common::graphObjSet->begin(); i != Common::graphObjSet->end(); ++i)
 	{
-		if (((*c) != (*i)) && c->IsNear(*i))
+		if (((*c) != (*i)))// && c->IsNear(*i))
 		{
 			c->clr = CLR_NEAR;
 
 			if (c->IsContact(*i))
 			{
-				c->vX *= -1;
-				c->vY *= -1;
+				if (!c->crushed)
+				{
+					c->vX *= -1;
+					c->vY *= -1;
+					c->crushed = true;
 
-				(*i)->vX *= -1;
-				(*i)->vY *= -1;
+					c->clr = Common::CLR_CHG;
+				}
+
+				if (!(*i)->crushed)
+				{
+					(*i)->vX *= -1;
+					(*i)->vY *= -1;
+					(*i)->crushed = true;
+				}
+				return true;
 			}
-
-			return true;
 		}
 	}
 

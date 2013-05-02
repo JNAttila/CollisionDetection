@@ -27,7 +27,7 @@ static bool RENDER_PAUSE;
 static bool RENDER_STEP;
 
 
-void DrawGraphObj(const GraphObject *c)
+void DrawGraphObj(GraphObject *c)
 {
 	// invalid pointer esetén ne szálljunk el
 	if (!c) return;
@@ -44,6 +44,21 @@ void DrawGraphObj(const GraphObject *c)
 	}
 
 	glEnd();
+
+	/*glBegin(GL_LINE_LOOP);
+
+	// szín beállítása a kör alapján
+	glColor3f( c->clr->g, c->clr->b, c->clr->r);
+
+	// vonal sor rajzolása
+	glVertex2f(c->XMin(), c->YMin());
+	glVertex2f(c->XMin(), c->YMax());
+	glVertex2f(c->XMax(), c->YMax());
+	glVertex2f(c->XMax(), c->YMin());
+
+	glEnd();*/
+
+	c->crushed = false;
 }
 
 
@@ -55,8 +70,7 @@ void RenderScene(void)
 
 	// >> Modellezo programresz
 
-	for(set<GraphObject*>::iterator it = Common::graphObjSet->begin();
-		it != Common::graphObjSet->end(); ++it)
+	for(set<GraphObject*>::iterator it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
 	{
 		(*it)->clr = Common::CLR_NORMAL;
 		Common::DistanceCheck(*it);
@@ -278,18 +292,19 @@ int main(int argc, char* argv[])
 	float radius = 2.0;
 	float placeRadius = radius * 4;
 	float angle = 0.0;
-	int circleNum = 2;
+	int circleNum = 5;
 	float xShift = 0.0;
 	float yShift = 0.0;
 	float vX = 0.074;
 	float vY = 0.063;
 	for(int i=0; i < circleNum; ++i)
 	{
-		vX = 0.074 + 0.074 * ((rand() % 20) - 10) * 0.10;
-		vY = 0.063 + 0.063 * ((rand() % 20) - 10) * 0.10;
+		vX = 0.074 + 0.074 * ((rand() % 10) - 10) * 0.10;
+		vY = 0.063 + 0.063 * ((rand() % 10) - 10) * 0.10;
 
 		float objAngle = (rand() % 100) / 100.0 * GL_PI;
-		Common::graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift, radius, rand() % 5 + 3, objAngle,
+		Common::graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift,
+			radius, /*rand() % 5*/i + 3, objAngle,
 
 			//new MyColor(i*0.1 + 0.3, i*0.1, 0.8),
 			Common::CLR_NORMAL,

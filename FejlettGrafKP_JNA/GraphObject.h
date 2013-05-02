@@ -21,6 +21,9 @@ public:
 	// orientáció
 	float rotAngle;
 
+	// ütközött
+	bool crushed;
+
 	// a pontok listája
 	vector<CMyPoint*> *points;
 

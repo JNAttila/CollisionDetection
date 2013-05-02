@@ -12,6 +12,8 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 {
 	points = new vector<CMyPoint*>();
 
+	crushed = false;
+
 	float xMin = 1000;
 	float xMax = -1000;
 	float yMin = 1000;
@@ -95,7 +97,7 @@ bool GraphObject::IsNear(GraphObject *obj)
 }
 
 // a két objektum ériintkezik-e egymással?
-bool GraphObject::IsContact(GraphObject *obj)
+bool GraphObject::IsContact2(GraphObject *obj)
 {
 	// az alap objektum pontjainak száma
 	long s = points->size();
@@ -136,7 +138,7 @@ bool GraphObject::IsContact(GraphObject *obj)
 
 
 // a két objektum ériintkezik-e egymással?
-bool GraphObject::IsContact2(GraphObject *obj)
+bool GraphObject::IsContact(GraphObject *obj)
 {
 	// az alap objektum pontjainak száma
 	long s = points->size();
@@ -148,37 +150,43 @@ bool GraphObject::IsContact2(GraphObject *obj)
 	int sgn;
 
 	// saját objektumon belül a forgásirány
-	int mySgn;
+	int mySgn = CMyPoint::RotDirct((*points)[0], (*points)[1], (*points)[2]);
 
 	// poligon vágást kell csinálni, hogy a vizsgált objektum bármelyik pontja
 	// belül van-e az n körvonalamon
-
-	// sajátmagam minden pontjára
-	for(int i = 0; i < s; ++i)
+	bool ret = false;
+	
+	// az összehasonlított objektum minden pontjára
+	for(int i = 0; i < so && !ret; ++i)
 	{
-		// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-		int mySgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s], (*points)[(i + 2) % s]);
+		int sgnCnt = 0;
 
-
-		bool kulonVannak = true;
-
-		// az összehasonlított objektum minden pontjával
-		for(int j = 0; j < so; ++j)
+		// minden sajátpontommal
+		for(int j = 0; j < s; ++j)
 		{
-			sgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s],
-				(*(obj->points))[j % so]);
+			sgn = CMyPoint::RotDirct((*points)[j % s], (*points)[(j + 1) % s],
+				(*(obj->points))[i % so]);
 
-			kulonVannak &= (mySgn != sgn);
+			sgnCnt += sgn;
+
+			if (sgn == 0)
+				ret = true;
 		}
 
-		if (kulonVannak)
-		{
-			clr = Common::CLR_CHG;
-			return false;
-		}
+		if (ret)
+			printf("RET!!\n");
+
+		if (sgnCnt == s-1)
+			printf("s-1 :  %d\n", sgnCnt); 
+		
+		if (sgnCnt == s)
+			printf("s :  %d\n", sgnCnt);
+
+		if (abs(sgnCnt) >= s-1)
+			ret = true;
 	}
 
-	return true;
+	return ret;
 }
 
 

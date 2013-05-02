@@ -7,6 +7,7 @@ using namespace std;
 class Common
 {
 public:
+	static bool PointLineDist(CMyPoint *p1, CMyPoint *p2, CMyPoint *pp);
 	static bool DistanceCheck(GraphObject *c);
 	static void UpDateGraphObjectPosition(GraphObject *c);
 
