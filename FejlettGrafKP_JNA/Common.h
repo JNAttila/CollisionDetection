@@ -11,6 +11,8 @@ public:
 	static bool DistanceCheck(GraphObject *c);
 	static void UpDateGraphObjectPosition(GraphObject *c);
 
+	static bool Reflect(float alfa, float &vX, float &vY);
+
 	static set<GraphObject*> *graphObjSet;
 	static bool renderForward;
 
@@ -24,5 +26,16 @@ public:
 	static float screenYMax;
 
 	static float nRange;
+	static float _PI;
+
+	static bool _RENDER_PAUSE;
+	static bool _RENDER_STEP;
+	static bool _DETAIL;
+
+	static void GetRandSpeed(float &vx, float &vy);
+	static void GetRandPosition(float &pX, float &pY);
+
+	static bool AddGraphObject();
+	static bool DelGraphObject();
 };
 

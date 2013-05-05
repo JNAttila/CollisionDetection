@@ -17,14 +17,8 @@
 using namespace std;
 
 
-// Define a constant for the value of PI
-#define GL_PI 3.141592654f
-
 static int MenuID, IdleMenu;
 static int IdlePrint = 0;
-
-static bool RENDER_PAUSE;
-static bool RENDER_STEP;
 
 
 void DrawGraphObj(GraphObject *c)
@@ -45,18 +39,21 @@ void DrawGraphObj(GraphObject *c)
 
 	glEnd();
 
-	/*glBegin(GL_LINE_LOOP);
+	if (Common::_DETAIL && c->clr == Common::CLR_NORMAL)
+	{
+		glBegin(GL_LINE_LOOP);
 
-	// szín beállítása a kör alapján
-	glColor3f( c->clr->g, c->clr->b, c->clr->r);
+		// szín beállítása a kör alapján
+		glColor3f( 0.0, 0.0, 0.9);
 
-	// vonal sor rajzolása
-	glVertex2f(c->XMin(), c->YMin());
-	glVertex2f(c->XMin(), c->YMax());
-	glVertex2f(c->XMax(), c->YMax());
-	glVertex2f(c->XMax(), c->YMin());
+		// vonal sor rajzolása
+		glVertex2f(c->XMin(), c->YMin());
+		glVertex2f(c->XMin(), c->YMax());
+		glVertex2f(c->XMax(), c->YMax());
+		glVertex2f(c->XMax(), c->YMin());
 
-	glEnd();*/
+		glEnd();
+	}
 
 	c->crushed = false;
 }
@@ -98,14 +95,13 @@ void SpecialKeys(int key, int x, int y)
 	// ...
 	int state;
 
-
 	if(key == GLUT_KEY_UP)
 	{
-		RENDER_PAUSE = !RENDER_PAUSE;
+		Common::_RENDER_PAUSE = !Common::_RENDER_PAUSE;
 	}
 	if(key == GLUT_KEY_DOWN)
 	{
-		Common::renderForward = !Common::renderForward;
+		Common::_DETAIL = !Common::_DETAIL;
 	}
 	if(key == GLUT_KEY_LEFT)
 	{
@@ -115,7 +111,6 @@ void SpecialKeys(int key, int x, int y)
 	{
 		Common::renderForward = false;
 	}
-
 
 	printf("Funkciobillentyu lenyomva, kodja %d, pozicio (%d,%d). ", key, x, y);
 	state = glutGetModifiers();
@@ -147,6 +142,11 @@ void Keyboard(unsigned char key, int x, int y)
 		printf("ALT lenyomva. ");
 	printf("\n");
 	fflush(stdout);
+	
+	if (key == 97) // 'a'
+		Common::AddGraphObject();
+	if (key == 100) // 'd'
+		Common::DelGraphObject();
 
 	glutPostRedisplay();
 }
@@ -155,10 +155,10 @@ void Timer(int value)
 {
 	//printf("Timer esemeny (%d)\n", value);
 
-	if (!RENDER_PAUSE || RENDER_STEP)
+	if (!Common::_RENDER_PAUSE || Common::_RENDER_STEP)
 	{
 		glutPostRedisplay();
-		RENDER_STEP = false;
+		Common::_RENDER_STEP = false;
 	}
 
 	//glutTimerFunc(1000, Timer, value + 1);
@@ -181,7 +181,7 @@ void ChangeSizeOrtho(int w, int h)
 
 	// Set Viewport to window dimensions
 	glViewport(0, 0, w, h);
-	
+
 	// Reset projection matrix stack
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -201,7 +201,7 @@ void ChangeSizeOrtho(int w, int h)
 		Common::screenYMin = -Common::nRange;
 		Common::screenYMax = Common::nRange;
 	}
-	
+
 	glOrtho (Common::screenXMin, Common::screenXMax, Common::screenYMin, Common::screenYMax,
 		-Common::nRange, Common::nRange);
 
@@ -277,8 +277,9 @@ void ProcessMenu(int value)
 int main(int argc, char* argv[])
 {
 	// >> Inicializalas
-	//srand(time(NULL));
-	Common::nRange = 10;
+	srand(time(NULL));
+	
+	Common::nRange = 20;
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -287,43 +288,12 @@ int main(int argc, char* argv[])
 
 	// >> Inicializálás
 
-	RENDER_PAUSE = true;
+	Common::_RENDER_PAUSE = true;
 
-	float radius = 2.0;
-	float placeRadius = radius * 4;
-	float angle = 0.0;
-	int circleNum = 5;
-	float xShift = 0.0;
-	float yShift = 0.0;
-	float vX = 0.074;
-	float vY = 0.063;
-	for(int i=0; i < circleNum; ++i)
+	for(int i=0; i < 5; ++i)
 	{
-		vX = 0.074 + 0.074 * ((rand() % 10) - 10) * 0.10;
-		vY = 0.063 + 0.063 * ((rand() % 10) - 10) * 0.10;
-
-		float objAngle = (rand() % 100) / 100.0 * GL_PI;
-		Common::graphObjSet->insert(new GraphObject(placeRadius * cos(angle) + xShift, placeRadius * sin(angle) + yShift,
-			radius, /*rand() % 5*/i + 3, objAngle,
-
-			//new MyColor(i*0.1 + 0.3, i*0.1, 0.8),
-			Common::CLR_NORMAL,
-
-			vX, vY));
-		angle += 2.0 * GL_PI / circleNum;
-	}/* */
-
-	/*int circleNum = 10;
-	for(int i=0; i < circleNum; ++i)
-	{
-	graphObjSet->insert(new CircleItem(i*1.2 - 2.0, i * (-1.3) - 2.0, radius,
-	new MyColor(i*0.1 + 0.3, i*0.1, 0.8), 0.074, 0.063));
-	}/* */
-
-
-
-	// << Inicializalas
-
+		Common::AddGraphObject();		
+	}
 
 	// >> Callback fuggvenyek
 

@@ -1,8 +1,6 @@
 #define _USE_MATH_DEFINES
 
 #include "Common.h"
-//#include "GraphObject.h"
-//#include "MyPoint.h"
 
 #include <math.h>
 
@@ -20,14 +18,16 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 	float yMax = -1000;
 
 	float newX, newY;
+	
+	numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	
 
-	float angle = rotA;
-	for(int i = 0;  i < nP; i++)
+	float angle = rotAngle;
+	for(int i = 0;  i < numPoints; i++)
 	{
-		angle += 2.0 * M_PI / nP;
+		angle += 2.0 * M_PI / numPoints;
 
-		newX = x + r * cos(angle);
-		newY = y + r * sin(angle);
+		newX = cX + R * cos(angle);
+		newY = cY + R * sin(angle);
 
 		// a szélsõ pontok x és y koordinátáinak megjegyzése
 		if (xMax < newX)
@@ -53,9 +53,7 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 		}
 
 		points->push_back(new CMyPoint( newX, newY));
-	}
-
-	numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	  
+	}  
 }
 
 float GraphObject::XMin()
@@ -89,11 +87,10 @@ bool GraphObject::IsNear(GraphObject *obj)
 	float objyMin = obj->YMin();
 	float objyMax = obj->YMax();
 
-	if (((xMin <= objxMin && objxMin <= xMax) || (xMin <= objxMax && objxMax <= xMax)) &&
-		((yMin <= objyMin && objyMin <= yMax) || (yMin <= objyMax && objyMax <= yMax)) )
-		return true;
-
-	return false;
+	return (
+		((xMin <= objxMin && objxMin <= xMax) || (xMin <= objxMax && objxMax <= xMax)) &&
+		((yMin <= objyMin && objyMin <= yMax) || (yMin <= objyMax && objyMax <= yMax))
+		);
 }
 
 // a két objektum ériintkezik-e egymással?
@@ -168,9 +165,6 @@ bool GraphObject::IsContact(GraphObject *obj)
 				(*(obj->points))[i % so]);
 
 			sgnCnt += sgn;
-
-			if (sgn == 0)
-				ret = true;
 		}
 
 		if (ret)
@@ -188,51 +182,6 @@ bool GraphObject::IsContact(GraphObject *obj)
 
 	return ret;
 }
-
-
-/*
-// a két objektum ériintkezik-e egymással?
-bool IsContact(GraphObject *obj)
-{
-// sajátmagam minden pontjára
-for(int i = 0; i < points->size(); ++i)
-{
-bool metszes = true;
-int sgn;
-
-// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-int signumMy = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
-(*points)[(i + 2) % points->size()]);
-
-int signumComp = RotDirct((*points)[i], (*points)[(i + 1) % points->size()],
-(*(obj->points))[0]);
-
-if (signumMy != signumComp)
-{
-// a vizsgált pont a másik oldalon van, érdemes folytatni
-
-// az összehasonlított objektum minden pontjával
-for(int j = 1; j < obj->points->size() + 1; ++j)
-{
-sgn = RotDirct((*points)[i % points->size()], (*points)[(i + 1) % points->size()],
-(*(obj->points))[j % obj->points->size()]);
-
-// ha bármely két pont 
-if (signumComp != sgn)
-{
-// összeérhet
-continue;
-}
-
-// nem ér össze
-return false;
-}
-}
-}
-
-return true;
-}
-/* */
 
 
 GraphObject::~GraphObject()

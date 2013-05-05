@@ -47,6 +47,7 @@ public:
 	float YMax();
 
 	bool IsNear(GraphObject *obj);
+	bool IsNear2(GraphObject *obj);
 	bool IsContact(GraphObject *obj);
 	bool IsContact2(GraphObject *obj);
 

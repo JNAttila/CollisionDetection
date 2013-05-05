@@ -13,6 +13,11 @@ float Common::screenXMax = 0;
 float Common::screenYMax = 0;
 
 float Common::nRange = 0;
+float Common::_PI = 3.14159265358979323846;
+
+bool Common::_RENDER_PAUSE = false;
+bool Common::_RENDER_STEP = false;
+bool Common::_DETAIL = false;
 
 set<GraphObject*> *Common::graphObjSet = new set<GraphObject*>();
 
@@ -41,35 +46,42 @@ bool Common::DistanceCheck(GraphObject *c)
 {
 	for (set<GraphObject*>::iterator i = Common::graphObjSet->begin(); i != Common::graphObjSet->end(); ++i)
 	{
-		if (((*c) != (*i)))// && c->IsNear(*i))
+		if (((*c) != (*i)) && c->IsNear(*i))
 		{
-			c->clr = CLR_NEAR;
+			if (_DETAIL)
+				c->clr = CLR_NEAR;
 
 			if (c->IsContact(*i))
 			{
+				float tmpVx = 0.0;
+				float tmpVy = 0.0;
+
 				if (!c->crushed)
 				{
-					c->vX *= -1;
-					c->vY *= -1;
-					c->crushed = true;
+					tmpVx = c->vX;
+					tmpVy = c->vY;
+
+					c->vX = (*i)->vX;
+					c->vY = (*i)->vY;
+
+					//c->crushed = true;
 
 					c->clr = Common::CLR_CHG;
 				}
 
 				if (!(*i)->crushed)
 				{
-					(*i)->vX *= -1;
-					(*i)->vY *= -1;
-					(*i)->crushed = true;
+					(*i)->vX = tmpVx;
+					(*i)->vY = tmpVy;
+
+					//(*i)->crushed = true;
 				}
-				return true;
 			}
 		}
 	}
 
 	return false;
 }
-
 
 void Common::UpDateGraphObjectPosition(GraphObject *c)
 {
@@ -124,20 +136,76 @@ void Common::UpDateGraphObjectPosition(GraphObject *c)
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	// az egymással érintkezés
-	set<GraphObject*>::iterator iter;
-	for(iter = graphObjSet->begin(); iter != graphObjSet->end(); ++iter)
-	{
-		if ((*iter)->clr == CLR_NEAR)
-		{
-		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////
 	// az elmozdulás alkalmazása
 	for(unsigned int i = 0; i < c->points->size(); ++i)
 	{
 		(*(c->points))[i]->x += shiftX;
 		(*(c->points))[i]->y += shiftY;
 	}
+}
+
+void Common::GetRandSpeed(float &vx, float &vy)
+{
+	float absSpeed = ((rand() % 6) + 3) / 40.0;
+	float direction = (rand() % 100 / 100.0) * _PI;
+
+	vx = absSpeed * cos(direction);
+	vy = absSpeed * sin(direction);
+}
+
+void Common::GetRandPosition(float &pX, float &pY)
+{
+	if (!_RENDER_PAUSE)
+	{
+		// futásközben mindig a képernyõ közepén jönnek létre az új objektumok
+		pX = 0.0;
+		pY = 0.0;
+		return;
+	}
+
+	pX = rand() % 30 - 15.0;
+	pY = rand() % 30 - 15.0;
+}
+
+bool Common::AddGraphObject()
+{
+	if (graphObjSet->size() >= 25)
+		return false;
+
+	float pX = 0.0;
+	float pY = 0.0;
+	GetRandPosition(pX, pY);
+
+	float vX = 0.0;
+	float vY = 0.0;
+	GetRandSpeed(vX, vY);
+
+	float orient = (rand() % 100) / 100.0 * _PI;
+
+	Common::graphObjSet->insert(new GraphObject(
+		pX,			// x
+		pY,			// y
+		(rand() % 4) / 4.0 + 2.0,	// r
+		rand() % 4 + 3,				// point num
+		orient,						// orientation
+		CLR_NORMAL,					// color
+		vX, vY)						// speed
+		);
+
+	return true;
+}
+
+bool Common::DelGraphObject()
+{
+	if (graphObjSet->size() <= 5)
+		return false;
+
+	int delPos = rand() % graphObjSet->size();
+
+	set<GraphObject*>::iterator it = graphObjSet->begin();
+	for (int i = 0; i < delPos; ++i, ++it);
+
+	graphObjSet->erase(it);
+
+	return true;
 }
