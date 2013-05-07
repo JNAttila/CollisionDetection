@@ -64,8 +64,6 @@ bool Common::DistanceCheck(GraphObject *c)
 					c->vX = (*i)->vX;
 					c->vY = (*i)->vY;
 
-					//c->crushed = true;
-
 					c->clr = Common::CLR_CHG;
 				}
 
@@ -73,8 +71,6 @@ bool Common::DistanceCheck(GraphObject *c)
 				{
 					(*i)->vX = tmpVx;
 					(*i)->vY = tmpVy;
-
-					//(*i)->crushed = true;
 				}
 			}
 		}
@@ -87,15 +83,10 @@ void Common::UpDateGraphObjectPosition(GraphObject *c)
 {
 	if (!c) return;
 
-	if (renderForward)
+	if (!renderForward)
 	{
-		c->cX += c->vX;
-		c->cY += c->vY;
-	}
-	else
-	{
-		c->cX -= c->vX;
-		c->cY -= c->vY;
+		c->vX *= -1.0;
+		c->vY *= -1.0;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -110,29 +101,29 @@ void Common::UpDateGraphObjectPosition(GraphObject *c)
 	dist = c->vX + c->XMax();
 	if (dist > screenXMax)
 	{
-		shiftX -= 2 * (c->XMax() + c->vX - screenXMax);
-		c->vX *= -1;
+		shiftX -= 2.0 * (c->XMax() + c->vX - screenXMax);
+		c->vX *= -1.0;
 	}
 
 	dist = c->vX + c->XMin();
 	if (dist < screenXMin)
 	{
-		shiftX -= 2 * (c->XMin() + c->vX - screenXMin);
-		c->vX *= -1;
+		shiftX -= 2.0 * (c->XMin() + c->vX - screenXMin);
+		c->vX *= -1.0;
 	}
 
 	dist = c->vY + c->YMax();
 	if (dist > screenYMax)
 	{
-		shiftY -= 2 * (c->YMax() + c->vY - screenYMax);
-		c->vY *= -1;
+		shiftY -= 2.0 * (c->YMax() + c->vY - screenYMax);
+		c->vY *= -1.0;
 	}
 
 	dist = c->vY + c->YMin();
 	if (dist < screenYMin)
 	{
-		shiftY -= 2 * (c->YMin() + c->vY - screenYMin);
-		c->vY *= -1;
+		shiftY -= 2.0 * (c->YMin() + c->vY - screenYMin);
+		c->vY *= -1.0;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -141,6 +132,12 @@ void Common::UpDateGraphObjectPosition(GraphObject *c)
 	{
 		(*(c->points))[i]->x += shiftX;
 		(*(c->points))[i]->y += shiftY;
+	}
+
+	if (!renderForward)
+	{
+		c->vX *= -1.0;
+		c->vY *= -1.0;
 	}
 }
 
@@ -183,13 +180,13 @@ bool Common::AddGraphObject()
 	float orient = (rand() % 100) / 100.0 * _PI;
 
 	Common::graphObjSet->insert(new GraphObject(
-		pX,			// x
-		pY,			// y
-		(rand() % 4) / 4.0 + 2.0,	// r
-		rand() % 4 + 3,				// point num
-		orient,						// orientation
-		CLR_NORMAL,					// color
-		vX, vY)						// speed
+		pX,				// x
+		pY,				// y
+		(rand() % 20) / 20.0 * 0.2 + 2.0,	// r
+		rand() % 4 + 3,		// point num
+		orient,				// orientation
+		CLR_NORMAL,			// color
+		vX, vY)				// speed
 		);
 
 	return true;

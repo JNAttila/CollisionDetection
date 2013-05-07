@@ -74,6 +74,9 @@ void RenderScene(void)
 		Common::UpDateGraphObjectPosition(*it);
 		DrawGraphObj(*it);
 	}
+
+	// újra a normális irányba a folyamat
+	Common::renderForward = true;
 	// << Modellezo programresz
 
 	// Flush drawing commands
@@ -142,7 +145,7 @@ void Keyboard(unsigned char key, int x, int y)
 		printf("ALT lenyomva. ");
 	printf("\n");
 	fflush(stdout);
-	
+
 	if (key == 97) // 'a'
 		Common::AddGraphObject();
 	if (key == 100) // 'd'
@@ -278,7 +281,7 @@ int main(int argc, char* argv[])
 {
 	// >> Inicializalas
 	srand(time(NULL));
-	
+
 	Common::nRange = 20;
 
 	glutInit(&argc, argv);
