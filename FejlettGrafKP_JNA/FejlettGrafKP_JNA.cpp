@@ -67,13 +67,33 @@ void RenderScene(void)
 
 	// >> Modellezo programresz
 
-	for(set<GraphObject*>::iterator it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
+	set<GraphObject*>::iterator it;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
 	{
 		(*it)->clr = Common::CLR_NORMAL;
 		Common::DistanceCheck(*it);
 		Common::UpDateGraphObjectPosition(*it);
 		DrawGraphObj(*it);
 	}
+	//
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	/*for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
+	{
+		(*it)->clr = Common::CLR_NORMAL;
+		Common::DistanceCheck(*it);
+	}
+	for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
+	{
+		Common::UpDateGraphObjectPosition(*it);
+		DrawGraphObj(*it);
+	}*/
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	// újra a normális irányba a folyamat
 	Common::renderForward = true;
