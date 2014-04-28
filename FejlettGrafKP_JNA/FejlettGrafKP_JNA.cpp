@@ -307,7 +307,7 @@ int main(int argc, char* argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
-	glutCreateWindow("Fejlett Grafikai Algoritmusok - Süni");
+	glutCreateWindow("Fejlett Grafikai Algoritmusok");
 
 	// >> Inicializálás
 
