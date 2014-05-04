@@ -24,6 +24,9 @@ public:
 	// ütközött
 	bool crushed;
 
+	// véletlenített alakzat
+	static bool randomRadius;
+
 	// a pontok listája
 	vector<CMyPoint*> *points;
 

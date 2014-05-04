@@ -5,6 +5,8 @@
 #include <math.h>
 
 
+bool GraphObject::randomRadius = false;
+
 GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor *c, float vx, float vy) :
 	cX(x), cY(y), R(r), numPoints(nP), rotAngle(rotA), clr(c), vX(vx), vY(vy)
 {
@@ -18,7 +20,9 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 	float yMax = -1000;
 
 	float newX, newY;
-	
+
+	float rFactor = 1.0;
+
 	numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	
 
 	float angle = rotAngle;
@@ -26,8 +30,12 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 	{
 		angle += 2.0 * M_PI / numPoints;
 
-		newX = cX + R * cos(angle);
-		newY = cY + R * sin(angle);
+		// globális változó alapján szabályos alakzatok, vagy sem
+		if (GraphObject::randomRadius)
+			rFactor = 1.0 + (rand() % 20 - 10) / 30.0;
+
+		newX = cX + R * rFactor * cos(angle);
+		newY = cY + R * rFactor * sin(angle);
 
 		// a szélsõ pontok x és y koordinátáinak megjegyzése
 		if (xMax < newX)
@@ -152,7 +160,7 @@ bool GraphObject::IsContact(GraphObject *obj)
 	// poligon vágást kell csinálni, hogy a vizsgált objektum bármelyik pontja
 	// belül van-e az n körvonalamon
 	bool ret = false;
-	
+
 	// az összehasonlított objektum minden pontjára
 	for(int i = 0; i < so && !ret; ++i)
 	{
@@ -172,7 +180,7 @@ bool GraphObject::IsContact(GraphObject *obj)
 
 		if (sgnCnt == s-1)
 			printf("s-1 :  %d\n", sgnCnt); 
-		
+
 		if (sgnCnt == s)
 			printf("s :  %d\n", sgnCnt);
 

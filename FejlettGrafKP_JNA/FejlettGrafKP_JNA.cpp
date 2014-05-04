@@ -68,7 +68,7 @@ void RenderScene(void)
 	// >> Modellezo programresz
 
 	set<GraphObject*>::iterator it;
-
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
@@ -83,13 +83,13 @@ void RenderScene(void)
 	//
 	/*for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
 	{
-		(*it)->clr = Common::CLR_NORMAL;
-		Common::DistanceCheck(*it);
+	(*it)->clr = Common::CLR_NORMAL;
+	Common::DistanceCheck(*it);
 	}
 	for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
 	{
-		Common::UpDateGraphObjectPosition(*it);
-		DrawGraphObj(*it);
+	Common::UpDateGraphObjectPosition(*it);
+	DrawGraphObj(*it);
 	}*/
 	//
 	////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,6 +303,11 @@ int main(int argc, char* argv[])
 	srand(time(NULL));
 
 	Common::nRange = 20;
+
+	if (argc > 1 && strcmp(argv[1], "-r") == 0)
+	{
+		GraphObject::randomRadius = true;
+	}
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
