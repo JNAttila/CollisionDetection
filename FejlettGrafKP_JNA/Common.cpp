@@ -15,6 +15,8 @@ float Common::screenYMax = 0;
 float Common::nRange = 0;
 float Common::_PI = 3.14159265358979323846;
 
+int Common::maxPoligonNum = 7;
+
 bool Common::_RENDER_PAUSE = false;
 bool Common::_RENDER_STEP = false;
 bool Common::_DETAIL = false;
@@ -183,7 +185,7 @@ bool Common::AddGraphObject()
 		pX,				// x
 		pY,				// y
 		(rand() % 20) / 20.0 * 0.2 + 2.0,	// r
-		rand() % 4 + 3,		// point num
+		rand() % (Common::maxPoligonNum - 2) + 3,		// point num
 		orient,				// orientation
 		CLR_NORMAL,			// color
 		vX, vY)				// speed

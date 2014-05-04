@@ -28,6 +28,8 @@ public:
 	static float nRange;
 	static float _PI;
 
+	static int maxPoligonNum;
+
 	static bool _RENDER_PAUSE;
 	static bool _RENDER_STEP;
 	static bool _DETAIL;

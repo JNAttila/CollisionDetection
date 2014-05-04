@@ -304,6 +304,7 @@ int main(int argc, char* argv[])
 
 	Common::nRange = 20;
 
+	// véletlen méretû objektumok
 	if (argc > 1 && strcmp(argv[1], "-r") == 0)
 	{
 		GraphObject::randomRadius = true;
@@ -317,8 +318,12 @@ int main(int argc, char* argv[])
 	// >> Inicializálás
 
 	Common::_RENDER_PAUSE = true;
+	
+	// mi legyen a maximális poligon csúcsszám
+	Common::maxPoligonNum = 7;
 
-	for(int i=0; i < 5; ++i)
+	// elõredefiniált mennyiségû objektum hozzáadása
+	for(int i=0; i < 7; ++i)
 	{
 		Common::AddGraphObject();		
 	}
