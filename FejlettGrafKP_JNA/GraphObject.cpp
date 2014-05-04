@@ -5,7 +5,7 @@
 #include <math.h>
 
 
-bool GraphObject::randomRadius = false;
+bool GraphObject::randomRadius = true;
 
 GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor *c, float vx, float vy) :
 	cX(x), cY(y), R(r), numPoints(nP), rotAngle(rotA), clr(c), vX(vx), vY(vy)
@@ -25,17 +25,25 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 
 	numPoints = (numPoints < 3) ? (3) : ((numPoints > 15) ? (15) : (numPoints));	
 
+	// orientáció szöge
 	float angle = rotAngle;
+	
+	// a poligon csúcspontjai
 	for(int i = 0;  i < numPoints; i++)
 	{
-		angle += 2.0 * M_PI / numPoints;
-
 		// globális változó alapján szabályos alakzatok, vagy sem
 		if (GraphObject::randomRadius)
 			rFactor = 1.0 + (rand() % 20 - 10) / 30.0;
 
 		newX = cX + R * rFactor * cos(angle);
 		newY = cY + R * rFactor * sin(angle);
+		
+		// konkáv alakzatok 5-szög esetén
+		if (numPoints == 5 && i == 2)
+		{
+			newX = cX;
+			newY = cY;
+		}
 
 		// a szélsõ pontok x és y koordinátáinak megjegyzése
 		if (xMax < newX)
@@ -60,8 +68,12 @@ GraphObject::GraphObject(float x, float y, float r, int nP, float rotA, MyColor 
 			iYMin = i;
 		}
 
+		// új pont tárolása
 		points->push_back(new CMyPoint( newX, newY));
-	}  
+
+		// középpont körüli elforgatás
+		angle += 2.0 * M_PI / numPoints;
+	}
 }
 
 float GraphObject::XMin()
@@ -102,43 +114,44 @@ bool GraphObject::IsNear(GraphObject *obj)
 }
 
 // a két objektum ériintkezik-e egymással?
-bool GraphObject::IsContact2(GraphObject *obj)
+bool GraphObject::IsContactConcave(GraphObject *obj)
 {
-	// az alap objektum pontjainak száma
-	long s = points->size();
-
-	// amit hasonlítunk hozzá objektum pontjainak száma
-	long so = obj->points->size();
-
-	// a két objektum pontjaiból számolt forgásirány
+	// objektumokat összehasonlító szakaszokból számolt forgásirány
 	int sgn;
 
-	// sajátmagam minden pontjára
-	for(int i = 0; i < s; ++i)
+	// saját objektumon belül a forgásirány
+	int mySgn = CMyPoint::RotDirct((*points)[0], (*points)[1], (*points)[2]);
+
+	// poligon vágást kell csinálni, hogy a vizsgált objektum bármelyik pontja
+	// belül van-e az n körvonalamon
+	bool ret = false;
+
+	// az összehasonlított objektum minden pontjára
+	for(int i = 0; i < obj->points->size() && !ret; ++i)
 	{
-		// a saját körvonalam mentén, az én következõ pontom ebben az irányban van
-		int mySgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s], (*points)[(i + 2) % s]);
+		sgn = 0;
 
-		// a vizsgált pont a másik oldalon van, érdemes folytatni
-
-		// az összehasonlított objektum minden pontjával
-		for(int j = 0; j < so; ++j)
+		// minden sajátpontommal
+		for(int j = 1; j < points->size() - 1; ++j)
 		{
-			sgn = CMyPoint::RotDirct((*points)[i % s], (*points)[(i + 1) % s],
-				(*(obj->points))[j % so]);
+			sgn += CMyPoint::RotDirct((*points)[0], (*points)[j],
+				(*(obj->points))[i]);
 
-			// azonos oldalon vannak és az elsõ kettõ által téglalapon belül a harmadik
-			if (mySgn == sgn && CMyPoint::IsPointBetween((*points)[i % s],
-				(*points)[(i + 1) % s], (*(obj->points))[j % so]))
-			{
-				// összeért
-				return true;
-			}
+			sgn += CMyPoint::RotDirct((*points)[j], (*points)[j + 1],
+				(*(obj->points))[i]);
+
+			sgn += CMyPoint::RotDirct((*points)[j + 1], (*points)[0],
+				(*(obj->points))[i]);
 		}
 
+		if (sgn == mySgn * 3)
+		{
+			printf("Collision!!\n");
+			ret = true;
+		}
 	}
 
-	return false;
+	return ret;
 }
 
 
@@ -194,11 +207,16 @@ bool GraphObject::IsContact(GraphObject *obj)
 
 GraphObject::~GraphObject()
 {
+	points->clear();
+	delete points;
+	points = NULL;
+
 	if (clr)
 		delete clr;
 	clr = NULL;
 }
 
+// objektumok egyezõsége
 bool GraphObject::operator==(const GraphObject *c)
 {
 	return (c->cX == cX) && (c->cY == cY) && (c->R == R) && (c->rotAngle == rotAngle);

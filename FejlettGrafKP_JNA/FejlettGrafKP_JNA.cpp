@@ -20,31 +20,35 @@ using namespace std;
 static int MenuID, IdleMenu;
 static int IdlePrint = 0;
 
-
+// egy objektum rajzolása
 void DrawGraphObj(GraphObject *c)
 {
 	// invalid pointer esetén ne szálljunk el
 	if (!c) return;
 
-	glBegin(GL_LINE_LOOP);
-
-	// szín beállítása a kör alapján
-	glColor3f( c->clr->r, c->clr->g, c->clr->b);
-
-	// vonal sor rajzolása
-	for(unsigned int i = 0;  i < c->points->size(); ++i)
+	// háromszögek rajzolása
+	for(unsigned int i = 1;  i < c->points->size() - 1; ++i)
 	{
+		glBegin(GL_TRIANGLES);
+
+		// szín beállítása az objektum alapján
+		// DEBUG esetén változó színezésû 3szögek
+		glColor3f( c->clr->r, c->clr->g, c->clr->b + ((Common::_DETAIL) ? (i % 3 * 0.4) : (0)));
+
+		glVertex2f( (*(c->points))[0]->x, (*(c->points))[0]->y);
 		glVertex2f( (*(c->points))[i]->x, (*(c->points))[i]->y);
+		glVertex2f( (*(c->points))[i + 1]->x, (*(c->points))[i + 1]->y);
+
+		glEnd();
 	}
 
-	glEnd();
-
+	// DEBUG esetén látszik a befoglaló 4zet, ha nincs hozzá közel másik obj
 	if (Common::_DETAIL && c->clr == Common::CLR_NORMAL)
 	{
 		glBegin(GL_LINE_LOOP);
 
 		// szín beállítása a kör alapján
-		glColor3f( 0.0, 0.0, 0.9);
+		glColor3f( 0.0, 0.3, 0.6);
 
 		// vonal sor rajzolása
 		glVertex2f(c->XMin(), c->YMin());
@@ -68,7 +72,7 @@ void RenderScene(void)
 	// >> Modellezo programresz
 
 	set<GraphObject*>::iterator it;
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//
 	for(it = Common::graphObjSet->begin(); it != Common::graphObjSet->end(); ++it)
@@ -304,12 +308,6 @@ int main(int argc, char* argv[])
 
 	Common::nRange = 20;
 
-	// véletlen méretû objektumok
-	if (argc > 1 && strcmp(argv[1], "-r") == 0)
-	{
-		GraphObject::randomRadius = true;
-	}
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
@@ -318,12 +316,12 @@ int main(int argc, char* argv[])
 	// >> Inicializálás
 
 	Common::_RENDER_PAUSE = true;
-	
+
 	// mi legyen a maximális poligon csúcsszám
-	Common::maxPoligonNum = 7;
+	Common::maxPoligonNum = 5;
 
 	// elõredefiniált mennyiségû objektum hozzáadása
-	for(int i=0; i < 7; ++i)
+	for(int i=0; i < 5; ++i)
 	{
 		Common::AddGraphObject();		
 	}

@@ -51,7 +51,7 @@ public:
 
 	bool IsNear(GraphObject *obj);
 	bool IsContact(GraphObject *obj);
-	bool IsContact2(GraphObject *obj);
+	bool IsContactConcave(GraphObject *obj);
 
 	bool operator==(const GraphObject *c);
 	bool operator!=(const GraphObject *c);

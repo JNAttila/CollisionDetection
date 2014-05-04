@@ -25,36 +25,21 @@ set<GraphObject*> *Common::graphObjSet = new set<GraphObject*>();
 
 bool Common::renderForward = true;
 
-bool Common::PointLineDist(CMyPoint *p1, CMyPoint *p2, CMyPoint *pp)
-{
-	if (!p1 || !p2 || !pp)
-		return false;
-
-	float  xMin = min<float>(p1->x, p2->x);
-	float  xMax = max<float>(p1->y, p2->y);
-	float  yMin = min<float>(p1->x, p2->x);
-	float  yMax = max<float>(p1->y, p2->y);
-
-	if (pp->x < xMin || pp->x > xMax || pp->y < yMin || pp->y > yMax)
-		return false;
-
-	if (abs(abs((p1->x - p2->x)/(p1->y - p2->y)) - abs((p1->x - pp->x)/(p1->y - pp->y))) < 0.1)
-		return true;
-
-	return false;
-}
-
+// távolság ellenõrzése
 bool Common::DistanceCheck(GraphObject *c)
 {
+	// minden grafikus objektumra
 	for (set<GraphObject*>::iterator i = Common::graphObjSet->begin(); i != Common::graphObjSet->end(); ++i)
 	{
+		// sajátmagával nem hasonlítunk össze && ha a befoglaló négyzetek összeérnek
 		if (((*c) != (*i)) && c->IsNear(*i))
 		{
 			if (_DETAIL)
 				c->clr = CLR_NEAR;
 
-			if (c->IsContact(*i))
+			if (c->IsContactConcave(*i))
 			{
+				// sebesség cseréhez
 				float tmpVx = 0.0;
 				float tmpVy = 0.0;
 
